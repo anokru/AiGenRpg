@@ -6,7 +6,6 @@
 #include "LocationTypeDefinition.h"
 
 #include "PCGComponent.h"
-#include "Engine/World.h"
 #include "Misc/Crc.h"
 #include "EngineUtils.h"
 
@@ -23,7 +22,10 @@ void AWorldManager::BeginPlay()
 
 void AWorldManager::ApplyWorldSeed()
 {
-    USaveSubsystem* SaveSubsystem = GetGameInstance()->GetSubsystem<USaveSubsystem>();
+    USaveSubsystem* SaveSubsystem = GetGameInstance()
+        ? GetGameInstance()->GetSubsystem<USaveSubsystem>()
+        : nullptr;
+
     if (!SaveSubsystem)
     {
         UE_LOG(LogTemp, Error, TEXT("WorldManager: SaveSubsystem not found"));
@@ -59,8 +61,8 @@ void AWorldManager::ApplyWorldSeed()
 
         const int32 Offset = Zone->GetResolvedSeedOffset();
 
-        // Соль от типа локации (если задан)
-        const int32 TypeSalt = Zone->LocationType
+        const int32 TypeSalt =
+            (Zone->LocationType != nullptr)
             ? StableSaltFromName(Zone->LocationType->LocationTypeId)
             : 0;
 
@@ -69,7 +71,8 @@ void AWorldManager::ApplyWorldSeed()
         PCG->Seed = FinalSeed;
         PCG->Generate();
 
-        UE_LOG(LogTemp, Warning, TEXT("WorldManager: Zone=%s ZoneId=%s Offset=%d Type=%s FinalSeed=%d"),
+        UE_LOG(LogTemp, Warning,
+            TEXT("WorldManager: Zone=%s ZoneId=%s Offset=%d Type=%s FinalSeed=%d"),
             *Zone->GetName(),
             *Zone->ZoneId.ToString(),
             Offset,
@@ -90,7 +93,6 @@ int32 AWorldManager::StableSaltFromName(const FName& Name)
 
 int32 AWorldManager::CombineSeeds(int32 A, int32 B, int32 C)
 {
-    // Простая смешивалка (чтобы seed реально менялся от всех частей)
     uint32 X = uint32(A);
     X ^= (uint32(B) + 0x9e3779b9u + (X << 6) + (X >> 2));
     X ^= (uint32(C) + 0x9e3779b9u + (X << 6) + (X >> 2));
