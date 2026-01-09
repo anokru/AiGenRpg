@@ -1,0 +1,26 @@
+# Unreal build artifacts
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+Content/
+
+# Visual Studio
+.vs/
+*.VC.db
+*.VC.opendb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs
+*.log
+
+# Local backups / temp
+Backup*/
+Temp/
+Developers/
+
+# Optional: keep or ignore solution files
+# *.sln
