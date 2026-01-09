@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "WorldManager.generated.h"
 
+class ULocationTypeDefinition;
+
 UCLASS()
 class AIGENRPG_API AWorldManager : public AActor
 {
@@ -17,6 +19,10 @@ protected:
 
 private:
     void ApplyWorldSeed();
+
+    // Если у зоны LocationType == nullptr, берём из этого списка детерминированно по seed.
+    UPROPERTY(EditAnywhere, Category = "World|Catalogs")
+    TArray<TObjectPtr<ULocationTypeDefinition>> DefaultLocationTypes;
 
     // Base world seed from SaveGame
     int32 WorldSeed = 0;

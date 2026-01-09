@@ -12,9 +12,8 @@ class AIGENRPG_API ULocationTypeDefinition : public UDataAsset
     GENERATED_BODY()
 
 public:
-    // Forest / Hills / Plains / Water / Swamp ...
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity")
-    FName LocationTypeId = "Plains";
+    FName LocationTypeId = TEXT("Plains");
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generation", meta = (ClampMin = "0.0", UIMin = "0.0"))
     float DensityMultiplier = 1.0f;

@@ -41,7 +41,7 @@ void AWorldManager::ApplyWorldSeed()
 
     WorldSeed = Save->WorldSeed;
 
-    // WorldId is FString => no ToString()
+    // WorldId is FString
     UE_LOG(LogTemp, Warning, TEXT("WorldManager: WorldId=%s Seed=%d"),
         *Save->WorldId, WorldSeed);
 
@@ -62,6 +62,19 @@ void AWorldManager::ApplyWorldSeed()
 
         const int32 Offset = Zone->GetResolvedSeedOffset();
 
+        // 1) Авто-назначение LocationType (если не задан руками)
+        if (Zone->LocationType == nullptr && DefaultLocationTypes.Num() > 0)
+        {
+            const int32 PickSeed = CombineSeeds(WorldSeed, Offset, SeasonSalt);
+            const int32 Index = int32(uint32(PickSeed) % uint32(DefaultLocationTypes.Num()));
+
+            if (DefaultLocationTypes[Index] != nullptr)
+            {
+                Zone->LocationType = DefaultLocationTypes[Index];
+            }
+        }
+
+        // 2) Итоговый seed зоны = WorldSeed + Offset + salt от типа
         const int32 TypeSalt =
             (Zone->LocationType != nullptr)
             ? StableSaltFromName(Zone->LocationType->LocationTypeId)
