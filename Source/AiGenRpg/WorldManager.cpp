@@ -1,12 +1,14 @@
 ﻿#include "WorldManager.h"
 
-#include "Kismet/GameplayStatics.h"
 #include "SaveSubsystem.h"
 #include "RPGSaveGame.h"
-#include "PCGComponent.h"
-
 #include "ZoneActor.h"
-#include "EngineUtils.h" // TActorIterator
+#include "LocationTypeDefinition.h"
+
+#include "PCGComponent.h"
+#include "Engine/World.h"
+#include "Misc/Crc.h"
+#include "EngineUtils.h"
 
 AWorldManager::AWorldManager()
 {
@@ -36,56 +38,61 @@ void AWorldManager::ApplyWorldSeed()
     }
 
     WorldSeed = Save->WorldSeed;
-    UE_LOG(LogTemp, Warning, TEXT("WorldManager: WorldSeed=%d"), WorldSeed);
 
-    int32 ZonesFound = 0;
-    int32 ZonesGenerated = 0;
+    UE_LOG(LogTemp, Warning, TEXT("WorldManager: WorldId=%s Seed=%d"),
+        *Save->WorldId.ToString(), WorldSeed);
+
+    int32 Applied = 0;
 
     for (TActorIterator<AZoneActor> It(GetWorld()); It; ++It)
     {
         AZoneActor* Zone = *It;
-        if (!Zone) continue;
-
-        ZonesFound++;
-
-        if (!Zone->bEnabled)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("WorldManager: Zone '%s' disabled -> skip"),
-                *Zone->ZoneId.ToString());
+        if (!Zone || !Zone->bEnabled)
             continue;
-        }
 
         UPCGComponent* PCG = Zone->GetPCG();
         if (!PCG)
         {
-            UE_LOG(LogTemp, Error, TEXT("WorldManager: Zone '%s' has no PCGComponent -> skip"),
-                *Zone->ZoneId.ToString());
+            UE_LOG(LogTemp, Warning, TEXT("WorldManager: %s has no PCGComponent"), *Zone->GetName());
             continue;
         }
 
         const int32 Offset = Zone->GetResolvedSeedOffset();
-        const int32 FinalSeed = WorldSeed + Offset;
+
+        // Соль от типа локации (если задан)
+        const int32 TypeSalt = Zone->LocationType
+            ? StableSaltFromName(Zone->LocationType->LocationTypeId)
+            : 0;
+
+        const int32 FinalSeed = CombineSeeds(WorldSeed, Offset, TypeSalt + SeasonSalt);
 
         PCG->Seed = FinalSeed;
-        PCG->Cleanup();
         PCG->Generate();
 
-        ZonesGenerated++;
-
-        UE_LOG(LogTemp, Warning, TEXT("WorldManager: Zone '%s' Offset=%d Seed=%d Actor=%s"),
+        UE_LOG(LogTemp, Warning, TEXT("WorldManager: Zone=%s ZoneId=%s Offset=%d Type=%s FinalSeed=%d"),
+            *Zone->GetName(),
             *Zone->ZoneId.ToString(),
             Offset,
-            FinalSeed,
-            *Zone->GetName());
+            Zone->LocationType ? *Zone->LocationType->LocationTypeId.ToString() : TEXT("None"),
+            FinalSeed
+        );
+
+        Applied++;
     }
 
-    if (ZonesFound == 0)
-    {
-        UE_LOG(LogTemp, Error, TEXT("WorldManager: No ZoneActor found on level"));
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("WorldManager: ZonesFound=%d ZonesGenerated=%d"),
-            ZonesFound, ZonesGenerated);
-    }
+    UE_LOG(LogTemp, Warning, TEXT("WorldManager: Applied seed to zones: %d"), Applied);
+}
+
+int32 AWorldManager::StableSaltFromName(const FName& Name)
+{
+    return int32(FCrc::StrCrc32(*Name.ToString()));
+}
+
+int32 AWorldManager::CombineSeeds(int32 A, int32 B, int32 C)
+{
+    // Простая смешивалка (чтобы seed реально менялся от всех частей)
+    uint32 X = uint32(A);
+    X ^= (uint32(B) + 0x9e3779b9u + (X << 6) + (X >> 2));
+    X ^= (uint32(C) + 0x9e3779b9u + (X << 6) + (X >> 2));
+    return int32(X);
 }

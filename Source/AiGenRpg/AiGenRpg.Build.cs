@@ -1,25 +1,21 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserved.
-
-using UnrealBuildTool;
+﻿using UnrealBuildTool;
 
 public class AiGenRpg : ModuleRules
 {
-	public AiGenRpg(ReadOnlyTargetRules Target) : base(Target)
-	{
-		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+    public AiGenRpg(ReadOnlyTargetRules Target) : base(Target)
+    {
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[]
-		{
-			"Core",
-			"CoreUObject",
-			"Engine",
-			"InputCore",
-			"EnhancedInput",
-			"PCG" // ⬅️ КРИТИЧНО
-		});
+        PublicDependencyModuleNames.AddRange(new string[]
+        {
+            "Core",
+            "CoreUObject",
+            "Engine",
+            "InputCore",
+            "EnhancedInput",
+            "PCG"
+        });
 
-		PrivateDependencyModuleNames.AddRange(new string[]
-		{
-		});
-	}
+        PrivateDependencyModuleNames.AddRange(new string[] { });
+    }
 }

@@ -1,34 +1,34 @@
-// #pragma once
+#pragma once
 
-// #include "CoreMinimal.h"
-// #include "Engine/DataAsset.h"
-// #include "LocationTypeDefinition.generated.h"
+#include "CoreMinimal.h"
+#include "Engine/DataAsset.h"
+#include "LocationTypeDefinition.generated.h"
 
-// UCLASS(BlueprintType)
-// class AIGENRPG_API ULocationTypeDefinition : public UDataAsset
-// {
-//     GENERATED_BODY()
+UCLASS(BlueprintType)
+class AIGENRPG_API ULocationTypeDefinition : public UDataAsset
+{
+    GENERATED_BODY()
 
-// public:
-//     // ���������� ID ���� ������� (Forest, Hills, Plains, ...)
-//     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity")
-//     FName LocationId;
+public:
+    // Уникальный ID типа локации (Forest, Hills, Plains, Water, Swamp...)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity")
+    FName LocationTypeId = "Plains";
 
-//     // ����� ��������� ��������
-//     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generation")
-//     float Density = 1.0f;
+    // Общая плотность объектов (множитель)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generation", meta = (ClampMin = "0.0", UIMin = "0.0"))
+    float DensityMultiplier = 1.0f;
 
-//     // ������� ������
-//     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generation")
-//     float HeightVariance = 0.0f;
+    // Разброс высоты / неровность (для будущих графов)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Generation", meta = (ClampMin = "0.0", UIMin = "0.0"))
+    float HeightVariance = 0.0f;
 
-//     // ���� ��� ���������
-//     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Meshes")
-//     TArray<TSoftObjectPtr<UStaticMesh>> MeshPool;
+    // Набор мешей (можно расширять)
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Meshes")
+    TArray<TSoftObjectPtr<UStaticMesh>> MeshPool;
 
-//     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flags")
-//     bool bAllowWater = false;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flags")
+    bool bAllowWater = false;
 
-//     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flags")
-//     bool bAllowRoads = false;
-// };
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Flags")
+    bool bAllowRoads = false;
+};

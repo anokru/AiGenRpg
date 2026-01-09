@@ -4,7 +4,9 @@
 #include "GameFramework/Actor.h"
 #include "ZoneActor.generated.h"
 
+class UBoxComponent;
 class UPCGComponent;
+class ULocationTypeDefinition;
 
 UCLASS()
 class AIGENRPG_API AZoneActor : public AActor
@@ -23,17 +25,27 @@ public:
     bool bEnabled = true;
 
     // Смещение относительно WorldSeed.
-    // Если = INT32_MIN -> будет авто-расчёт по ZoneId (детерминированно)
+    // INT32_MIN = авто-расчёт по ZoneId (детерминированно)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
     int32 SeedOffset = INT32_MIN;
 
-    // Вернуть PCG компонент (если он не на актёре — вернёт nullptr)
+    // Тип локации (лес/холмы/поле/вода/болото) — масштабируемо через DataAsset
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
+    TObjectPtr<ULocationTypeDefinition> LocationType;
+
+    UFUNCTION(BlueprintCallable, Category = "Zone")
     UPCGComponent* GetPCG() const;
 
-    // Рассчитать авто-offset по ZoneId (детерминированно)
+    UFUNCTION(BlueprintCallable, Category = "Zone")
     int32 GetResolvedSeedOffset() const;
 
+protected:
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    TObjectPtr<UBoxComponent> Box;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    TObjectPtr<UPCGComponent> PCG;
+
 private:
-    // Хелпер для хеша
-    static int32 StableHashToOffset(const FName& Name);
+    static int32 StableHashToOffset(const FString& S);
 };
