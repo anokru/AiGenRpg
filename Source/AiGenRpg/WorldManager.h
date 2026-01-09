@@ -18,10 +18,10 @@ protected:
 private:
     void ApplyWorldSeed();
 
-    // Базовый seed мира (из Save)
+    // Base world seed from SaveGame
     int32 WorldSeed = 0;
 
-    // Соль сезона (пока 0, сезоны добавим позже)
+    // Seasons later (keep 0 for now)
     int32 SeasonSalt = 0;
 
     static int32 StableSaltFromName(const FName& Name);

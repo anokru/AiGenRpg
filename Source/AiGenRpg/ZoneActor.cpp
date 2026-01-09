@@ -16,9 +16,18 @@ AZoneActor::AZoneActor()
     PCG->SetupAttachment(Box);
 }
 
-UPCGComponent* AZoneActor::GetPCG() const
+FName AZoneActor::GetResolvedZoneId() const
 {
-    return PCG;
+    if (ZoneId != NAME_None)
+        return ZoneId;
+
+#if WITH_EDITOR
+    const FString Label = GetActorLabel();
+    if (!Label.IsEmpty())
+        return FName(*Label);
+#endif
+
+    return GetFName();
 }
 
 int32 AZoneActor::GetResolvedSeedOffset() const
@@ -26,16 +35,12 @@ int32 AZoneActor::GetResolvedSeedOffset() const
     if (SeedOffset != INT32_MIN)
         return SeedOffset;
 
-    // Детерминированный оффсет от ZoneId (не зависит от сессии)
-    return StableHashToOffset(ZoneId.ToString());
+    return StableHashToOffset(GetResolvedZoneId().ToString());
 }
 
 int32 AZoneActor::StableHashToOffset(const FString& S)
 {
-    // CRC32 стабильный между запусками
     const uint32 Crc = FCrc::StrCrc32(*S);
-
-    // Делаем оффсет “не слишком маленький” и в int32
-    // Можно менять диапазон как угодно
+    // Keep it in a reasonable range to avoid int32 edge weirdness
     return int32(Crc % 1000000u);
 }

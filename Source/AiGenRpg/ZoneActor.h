@@ -16,34 +16,38 @@ class AIGENRPG_API AZoneActor : public AActor
 public:
     AZoneActor();
 
-    // Уникальный ID зоны (для логов/детерминизма/будущих систем)
+    // Unique zone id (used for deterministic seed offset).
+    // If None, will fallback to ActorLabel (Editor) or Actor name (Runtime).
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
-    FName ZoneId = "Zone";
+    FName ZoneId = NAME_None;
 
-    // Можно отключать зону без удаления
+    // Enable/disable zone without deleting it.
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
     bool bEnabled = true;
 
-    // Смещение относительно WorldSeed.
-    // INT32_MIN = авто-расчёт по ZoneId (детерминированно)
+    // Seed offset relative to WorldSeed.
+    // INT32_MIN = auto (stable hash from ZoneId).
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
     int32 SeedOffset = INT32_MIN;
 
-    // Тип локации (лес/холмы/поле/вода/болото) — масштабируемо через DataAsset
+    // Location type (forest/hills/plains/water/swamp...). Seasons later.
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
-    TObjectPtr<ULocationTypeDefinition> LocationType;
+    TObjectPtr<ULocationTypeDefinition> LocationType = nullptr;
 
     UFUNCTION(BlueprintCallable, Category = "Zone")
-    UPCGComponent* GetPCG() const;
+    UPCGComponent* GetPCG() const { return PCG; }
 
     UFUNCTION(BlueprintCallable, Category = "Zone")
     int32 GetResolvedSeedOffset() const;
 
+    UFUNCTION(BlueprintCallable, Category = "Zone")
+    FName GetResolvedZoneId() const;
+
 protected:
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Zone")
     TObjectPtr<UBoxComponent> Box;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Zone")
     TObjectPtr<UPCGComponent> PCG;
 
 private:
