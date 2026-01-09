@@ -16,21 +16,16 @@ class AIGENRPG_API AZoneActor : public AActor
 public:
     AZoneActor();
 
-    // Unique zone id (used for deterministic seed offset).
-    // If None, will fallback to ActorLabel (Editor) or Actor name (Runtime).
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
     FName ZoneId = NAME_None;
 
-    // Enable/disable zone without deleting it.
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
     bool bEnabled = true;
 
-    // Seed offset relative to WorldSeed.
-    // INT32_MIN = auto (stable hash from ZoneId).
+    // INT32_MIN => auto (stable hash from ZoneId)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
     int32 SeedOffset = INT32_MIN;
 
-    // Location type (forest/hills/plains/water/swamp...). Seasons later.
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Zone")
     TObjectPtr<ULocationTypeDefinition> LocationType = nullptr;
 

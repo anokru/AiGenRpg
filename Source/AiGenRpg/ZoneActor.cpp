@@ -12,8 +12,8 @@ AZoneActor::AZoneActor()
     SetRootComponent(Box);
     Box->SetBoxExtent(FVector(5000.f, 5000.f, 500.f));
 
+    // UPCGComponent is NOT a SceneComponent => no SetupAttachment()
     PCG = CreateDefaultSubobject<UPCGComponent>(TEXT("PCG"));
-    PCG->SetupAttachment(Box);
 }
 
 FName AZoneActor::GetResolvedZoneId() const
@@ -41,6 +41,5 @@ int32 AZoneActor::GetResolvedSeedOffset() const
 int32 AZoneActor::StableHashToOffset(const FString& S)
 {
     const uint32 Crc = FCrc::StrCrc32(*S);
-    // Keep it in a reasonable range to avoid int32 edge weirdness
     return int32(Crc % 1000000u);
 }

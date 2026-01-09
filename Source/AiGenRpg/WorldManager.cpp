@@ -6,8 +6,8 @@
 #include "LocationTypeDefinition.h"
 
 #include "PCGComponent.h"
-#include "Misc/Crc.h"
 #include "EngineUtils.h"
+#include "Misc/Crc.h"
 
 AWorldManager::AWorldManager()
 {
@@ -41,8 +41,9 @@ void AWorldManager::ApplyWorldSeed()
 
     WorldSeed = Save->WorldSeed;
 
+    // WorldId is FString => no ToString()
     UE_LOG(LogTemp, Warning, TEXT("WorldManager: WorldId=%s Seed=%d"),
-        *Save->WorldId.ToString(), WorldSeed);
+        *Save->WorldId, WorldSeed);
 
     int32 Applied = 0;
 
@@ -74,7 +75,7 @@ void AWorldManager::ApplyWorldSeed()
         UE_LOG(LogTemp, Warning,
             TEXT("WorldManager: Zone=%s ZoneId=%s Offset=%d Type=%s FinalSeed=%d"),
             *Zone->GetName(),
-            *Zone->ZoneId.ToString(),
+            *Zone->GetResolvedZoneId().ToString(),
             Offset,
             Zone->LocationType ? *Zone->LocationType->LocationTypeId.ToString() : TEXT("None"),
             FinalSeed
